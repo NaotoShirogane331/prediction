@@ -1,0 +1,3 @@
+person_id,visit_id,modality,path
+001,v001,audio,fictional/001/v001/audio.wav
+001,v001,video,fictional/001/v001/video.mp4

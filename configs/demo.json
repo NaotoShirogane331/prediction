@@ -1,0 +1,12 @@
+{
+  "seed": 2026,
+  "n_people": 120,
+  "epochs": 30,
+  "patience": 5,
+  "batch_size": 16,
+  "learning_rate": 0.001,
+  "rgcn_hidden": 32,
+  "temporal_hidden": 64,
+  "quantiles": [0.05, 0.25, 0.5, 0.75, 0.95],
+  "horizons_days": [90, 180, 365]
+}

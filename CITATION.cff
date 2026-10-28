@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: Cognitive Trajectory Prediction
+abstract: >-
+  A runnable synthetic research prototype combining a typed per-visit graph,
+  a time-aware LSTM, and an ordered horizon-conditioned quantile head.
+authors:
+  - name: Cognitive Trajectory Prediction contributors
+version: 0.1.0
+date-released: 2026-10-29
+url: "https://github.com/NaotoShirogane331/cognitive-trajectory-prediction"
+repository-code: "https://github.com/NaotoShirogane331/cognitive-trajectory-prediction"
+license: MIT
+keywords:
+  - synthetic-data
+  - trajectory-prediction
+  - relational-graph-convolution
+  - time-aware-lstm
+  - quantile-regression
