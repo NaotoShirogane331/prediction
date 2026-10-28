@@ -16,10 +16,13 @@ def plot_trajectory(data_dir: Path, predictions_path: Path, output: Path) -> Non
     import matplotlib.dates as mdates
     import matplotlib.pyplot as plt
 
-    from .data import load_tables
+    from .data import _visits, load_tables
 
     visits, _, _ = load_tables(Path(data_dir))
-    predictions = pd.read_csv(predictions_path, dtype={"person_id": str, "origin_visit_id": str})
+    visits = _visits(visits)
+    predictions = pd.read_csv(
+        predictions_path, dtype={"person_id": str, "origin_visit_id": str}, keep_default_na=False
+    )
     first = predictions.iloc[0]
     person, origin_id = first["person_id"], first["origin_visit_id"]
     future = predictions[

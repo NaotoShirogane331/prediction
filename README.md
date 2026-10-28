@@ -1,5 +1,7 @@
 # Cognitive Trajectory Prediction
 
+**多人认知轨迹的跨模态融合与分位数预测**
+
 一个可在 CPU 上运行的**合成数据研究原型**：将每次访视的四组数值特征组织为关系图，再用时间感知 LSTM 编码不规则访视历史，预测指定未来日期的五个分位数。项目组合并独立实现已有方法，不主张发明 R-GCN、T-LSTM 或分位数回归。
 
 **English abstract.** This runnable synthetic research prototype combines a typed per-visit graph, a time-aware LSTM, and a baseline-relative ordered quantile head for horizon-conditioned trajectory prediction. It demonstrates a reproducible training and inference workflow; it provides no evidence of clinical performance.
@@ -8,10 +10,12 @@
 
 ## 快速开始
 
-需要 Python **3.12**。在项目根目录执行：
+需要 Python **3.12**，以下命令使用 [uv](https://docs.astral.sh/uv/getting-started/installation/) 安装锁定依赖：
 
 ```bash
-uv sync --extra dev
+git clone https://github.com/NaotoShirogane331/cognitive-trajectory-prediction.git
+cd cognitive-trajectory-prediction
+uv sync --locked --extra dev
 uv run ctp demo --output outputs/demo
 uv run pytest
 uv run ruff check .
@@ -63,6 +67,8 @@ uv run ctp demo --output outputs/demo-full --n-people 120 --epochs 30 --seed 202
 模型目录包含 `model.pt`、`preprocessor.json`、`config.json`、`splits.json`、`training_history.csv` 和 `training_summary.json`。预测 CSV 包含人员与日期标识、`horizon_days`、`baseline`、`q05/q25/q50/q75/q95`。评估给出中位数 MAE、pinball loss、名义 90% 区间的经验覆盖率与宽度，以及末次可用分数基线 MAE；这些只是当前合成数据上的指标，不代表真实人群表现。
 
 `demo` 输出目录中的 `raw/` 保存生成表与 `provenance.json`，`prepared/` 保存规范化表与复制的来源说明，`model/` 保存训练状态；`predictions.csv` 仅包含测试集预测，`metrics.json` 保存指标，`trajectory.png` 展示实际预测及起点已可用的历史分数，`summary.json` 汇总流程。图中标记合成数据来源。
+
+已执行的测试范围和默认合成示例指标见[验证记录](docs/verification.md)。
 
 ## 数据与方法
 

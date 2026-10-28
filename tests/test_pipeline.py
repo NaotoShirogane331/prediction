@@ -71,3 +71,37 @@ def test_evaluate_rejects_duplicate_prediction_keys(tmp_path):
     targets.to_csv(tmp_path / "predictions.csv", index=False)
     with pytest.raises(ValueError, match="duplicate"):
         evaluate(data, tmp_path / "predictions.csv", tmp_path / "metrics.json")
+
+
+def test_literal_na_identifiers_survive_prediction_and_evaluation(tmp_path):
+    from cognitive_trajectory.pipeline import evaluate, predict, train_model
+    from cognitive_trajectory.synthetic import generate_data
+
+    data = tmp_path / "data"
+    generate_data(data, n_people=10)
+    for filename in ["visits.csv", "assets.csv", "targets.csv"]:
+        frame = pd.read_csv(data / filename, dtype=str, keep_default_na=False)
+        frame["person_id"] = frame.person_id.replace({"0001": "NA"})
+        frame.to_csv(data / filename, index=False)
+    train_model(data, tmp_path / "model", epochs=1)
+    result = predict(data, tmp_path / "model", tmp_path / "pred.csv")
+    assert "NA" in set(result.person_id)
+    metrics = evaluate(data, tmp_path / "pred.csv", tmp_path / "metrics.json")
+    assert metrics["n_predictions"] == 30
+
+
+def test_evaluation_uses_same_canonical_dates_as_prediction(tmp_path):
+    from cognitive_trajectory.pipeline import evaluate, predict, train_model
+    from cognitive_trajectory.synthetic import generate_data
+
+    data = tmp_path / "data"
+    generate_data(data, n_people=10)
+    train_model(data, tmp_path / "model", epochs=1)
+    targets = pd.read_csv(data / "targets.csv", dtype=str, keep_default_na=False)
+    targets["target_date"] = targets.target_date.map(
+        lambda value: "-".join(str(int(piece)) for piece in value.split("-"))
+    )
+    targets.to_csv(data / "targets.csv", index=False)
+    result = predict(data, tmp_path / "model", tmp_path / "pred.csv")
+    metrics = evaluate(data, tmp_path / "pred.csv", tmp_path / "metrics.json")
+    assert metrics["n_predictions"] == len(result)

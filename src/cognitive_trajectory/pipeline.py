@@ -12,7 +12,17 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from .data import Preprocessor, build_samples, check_data, fit_preprocessor, load_tables, make_splits
+from .data import (
+    Preprocessor,
+    _date,
+    _required,
+    _strings,
+    build_samples,
+    check_data,
+    fit_preprocessor,
+    load_tables,
+    make_splits,
+)
 from .losses import pinball_loss
 from .model import CognitiveTrajectoryModel
 from .schema import QUANTILE_COLUMNS, QUANTILES, SCHEMA_VERSION
@@ -218,9 +228,14 @@ def predict(data_dir: Path, model_dir: Path, output_path: Path, split=None) -> p
 
 def evaluate(data_dir: Path, predictions_path: Path, output_path: Path) -> dict:
     _, _, targets = load_tables(Path(data_dir))
-    predictions = pd.read_csv(predictions_path, dtype={"person_id": str, "origin_visit_id": str})
+    predictions = pd.read_csv(
+        predictions_path, dtype={"person_id": str, "origin_visit_id": str}, keep_default_na=False
+    )
     keys = ["person_id", "origin_visit_id", "target_date"]
     for frame, name in [(predictions, "predictions"), (targets, "targets")]:
+        _required(frame, keys, name)
+        _strings(frame, ["person_id", "origin_visit_id"], name)
+        frame["target_date"] = frame["target_date"].map(lambda value: _date(value, "target_date"))
         if frame.duplicated(keys).any():
             raise ValueError(f"duplicate {name} keys")
     if predictions.empty:
